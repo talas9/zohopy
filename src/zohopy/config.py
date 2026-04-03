@@ -125,22 +125,22 @@ class ZohoConfig(BaseSettings):
         description="OAuth client secret",
     )
     refresh_token: str = Field(
-        default="",
+        ...,
         repr=False,
-        description="Long-lived OAuth refresh token (empty if not yet generated)",
+        description="Long-lived OAuth refresh token",
     )
     organization_id: str = Field(
-        default="",
-        description="Zoho organization ID (auto-discovered if not set)",
+        ...,
+        description="Zoho organization ID",
     )
     data_center: DataCenter = Field(
-        default=DataCenter.US,
-        description="Zoho data-center region (auto-detected from api_domain if available)",
+        ...,
+        description="Zoho data-center region (us, eu, in, au, jp, ca, cn, sa)",
     )
     api_domain: str = Field(
         default="",
         repr=False,
-        description="API domain returned during token exchange (used to auto-detect data center)",
+        description="API domain (optional — overrides data_center if set)",
     )
     timeout: float = Field(
         default=30.0,

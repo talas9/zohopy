@@ -52,24 +52,31 @@ class TestZohoConfig:
         assert cfg.accounts_url == "https://accounts.zoho.eu"
         assert cfg.base_api_url == "https://www.zohoapis.eu"
 
-    def test_defaults(self):
-        env_override = {
-            "ZOHO_CLIENT_ID": "c",
-            "ZOHO_CLIENT_SECRET": "s",
-            "ZOHO_REFRESH_TOKEN": "",
-            "ZOHO_ORGANIZATION_ID": "",
-            "ZOHO_API_DOMAIN": "",
-            "ZOHO_DATA_CENTER": "us",
-        }
-        with mock.patch.dict(os.environ, env_override, clear=False):
-            cfg = ZohoConfig(
-                client_id="c",
-                client_secret="s",
-                _env_file=None,  # type: ignore[call-arg]
-            )
+    def test_all_required_fields(self):
+        cfg = ZohoConfig(
+            client_id="c",
+            client_secret="s",
+            refresh_token="rt",
+            organization_id="org",
+            data_center=DataCenter.US,
+            _env_file=None,  # type: ignore[call-arg]
+        )
         assert cfg.data_center == DataCenter.US
         assert cfg.timeout == 30.0
         assert cfg.max_retries == 3
+        assert cfg.api_domain == ""
+
+    def test_missing_required_raises(self):
+        import pytest
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError):
+            ZohoConfig(
+                client_id="c",
+                client_secret="s",
+                _env_file=None,  # type: ignore[call-arg]
+                # missing: refresh_token, organization_id, data_center
+            )
 
     def test_api_domain_auto_detects_dc(self):
         cfg = ZohoConfig(
