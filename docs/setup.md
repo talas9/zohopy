@@ -1,0 +1,126 @@
+# Setup Guide
+
+## OAuth Setup
+
+### Interactive Wizard (recommended)
+
+```bash
+zohopy setup
+# or
+python -m zohopy
+```
+
+Supports two flows:
+1. **Self Client** — paste a grant code from the API Console
+2. **Browser redirect** — opens browser, captures OAuth code on localhost
+
+Both auto-detect your data center and discover your organizations.
+
+### Manual Setup
+
+1. Go to [api-console.zoho.com](https://api-console.zoho.com/)
+2. Create a **Self Client** app
+3. Generate a grant code with scope `ZohoBooks.fullaccess.all`
+4. Exchange it:
+
+```python
+from zohopy.setup import exchange_grant_token
+
+result = exchange_grant_token(
+    client_id="YOUR_CLIENT_ID",
+    client_secret="YOUR_CLIENT_SECRET",
+    grant_token="THE_GRANT_CODE",
+)
+# result["refresh_token"] — permanent
+# result["api_domain"] — your data center
+```
+
+5. Create `.env`:
+
+```env
+ZOHO_CLIENT_ID=...
+ZOHO_CLIENT_SECRET=...
+ZOHO_REFRESH_TOKEN=...
+ZOHO_ORGANIZATION_ID=...
+ZOHO_API_DOMAIN=https://www.zohoapis.com
+```
+
+## Configuration Modes
+
+### Local Development (.env file)
+
+```python
+from zohopy import ZohoConfig
+config = ZohoConfig()  # auto-reads .env
+```
+
+### Server / Docker (env vars)
+
+```bash
+docker run \
+  -e ZOHO_CLIENT_ID=... \
+  -e ZOHO_CLIENT_SECRET=... \
+  -e ZOHO_REFRESH_TOKEN=... \
+  -e ZOHO_ORGANIZATION_ID=... \
+  -e ZOHO_API_DOMAIN=https://www.zohoapis.com \
+  zohopy contacts list --json
+```
+
+### Programmatic (submodule integration)
+
+```python
+from zohopy import ZohoConfig, SyncZohoClient
+
+config = ZohoConfig(
+    client_id="...",
+    client_secret="...",
+    refresh_token="...",
+    organization_id="...",
+    api_domain="https://www.zohoapis.com",
+    _env_file=None,  # skip .env
+)
+```
+
+### Docker Compose
+
+```bash
+docker compose run --rm zohopy-setup   # OAuth wizard
+docker compose run --rm zohopy         # Run commands
+```
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `ZOHO_CLIENT_ID` | Yes | — | OAuth client ID |
+| `ZOHO_CLIENT_SECRET` | Yes | — | OAuth client secret |
+| `ZOHO_REFRESH_TOKEN` | Yes | — | Permanent refresh token |
+| `ZOHO_ORGANIZATION_ID` | Yes | — | Zoho org ID |
+| `ZOHO_API_DOMAIN` | No | — | Auto-detects data center |
+| `ZOHO_DATA_CENTER` | No | `us` | Manual: us/eu/in/au/jp/ca/cn/sa |
+| `ZOHOPY_LOG_LEVEL` | No | `INFO` | DEBUG/INFO/WARNING/ERROR |
+| `ZOHOPY_LOG_FORMAT` | No | `console` | console or json |
+
+## Logging
+
+```python
+from zohopy import configure_logging
+
+configure_logging(level="DEBUG", log_format="console")  # dev
+configure_logging(level="INFO", log_format="json")       # production
+```
+
+## Data Centers
+
+| Region | Accounts URL | API URL |
+|--------|-------------|---------|
+| US | accounts.zoho.com | zohoapis.com |
+| EU | accounts.zoho.eu | zohoapis.eu |
+| IN | accounts.zoho.in | zohoapis.in |
+| AU | accounts.zoho.com.au | zohoapis.com.au |
+| JP | accounts.zoho.jp | zohoapis.jp |
+| CA | accounts.zohocloud.ca | zohoapis.ca |
+| CN | accounts.zoho.com.cn | zohoapis.com.cn |
+| SA | accounts.zoho.sa | zohoapis.sa |
+
+Data center is auto-detected from `ZOHO_API_DOMAIN` — you rarely need to set it manually.
