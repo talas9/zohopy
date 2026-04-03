@@ -62,7 +62,7 @@ def _parse_token_response(body: dict[str, object]) -> tuple[str, int]:
     token = body.get("access_token")
     if not isinstance(token, str) or not token:
         raise ZohoTokenRefreshError(f"Unexpected token response: {body}")
-    expires_in = int(body.get("expires_in", 3600))
+    expires_in = int(body.get("expires_in", 3600))  # type: ignore[call-overload]
     return token, expires_in
 
 

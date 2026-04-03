@@ -233,20 +233,20 @@ class AsyncUsers(AsyncResource):
 class Preferences(SyncResource):
     _api_prefix, _resource = _P, "settings/preferences"
 
-    def get(self, **params: Any) -> dict[str, Any]:
+    def get(self, **params: Any) -> dict[str, Any]:  # type: ignore[override]
         return self._client.get(self._path(), params=params or None)
 
-    def update(self, data: dict[str, Any]) -> dict[str, Any]:
+    def update(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return self._client.put(self._path(), json=data)
 
 
 class AsyncPreferences(AsyncResource):
     _api_prefix, _resource = _P, "settings/preferences"
 
-    async def get(self, **params: Any) -> dict[str, Any]:
+    async def get(self, **params: Any) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.get(self._path(), params=params or None)
 
-    async def update(self, data: dict[str, Any]) -> dict[str, Any]:
+    async def update(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.put(self._path(), json=data)
 
 
@@ -261,32 +261,32 @@ class AsyncTemplates(AsyncResource):
 class OpeningBalances(SyncResource):
     _api_prefix, _resource = _P, "settings/openingbalances"
 
-    def get(self, **params: Any) -> dict[str, Any]:
+    def get(self, **params: Any) -> dict[str, Any]:  # type: ignore[override]
         return self._client.get(self._path(), params=params or None)
 
-    def create(self, data: dict[str, Any]) -> dict[str, Any]:
+    def create(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return self._client.post(self._path(), json=data)
 
-    def update(self, data: dict[str, Any]) -> dict[str, Any]:
+    def update(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return self._client.put(self._path(), json=data)
 
-    def delete(self) -> dict[str, Any]:
+    def delete(self) -> dict[str, Any]:  # type: ignore[override]
         return self._client.delete(self._path())
 
 
 class AsyncOpeningBalances(AsyncResource):
     _api_prefix, _resource = _P, "settings/openingbalances"
 
-    async def get(self, **params: Any) -> dict[str, Any]:
+    async def get(self, **params: Any) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.get(self._path(), params=params or None)
 
-    async def create(self, data: dict[str, Any]) -> dict[str, Any]:
+    async def create(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.post(self._path(), json=data)
 
-    async def update(self, data: dict[str, Any]) -> dict[str, Any]:
+    async def update(self, data: dict[str, Any]) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.put(self._path(), json=data)
 
-    async def delete(self) -> dict[str, Any]:
+    async def delete(self) -> dict[str, Any]:  # type: ignore[override]
         return await self._client.delete(self._path())
 
 

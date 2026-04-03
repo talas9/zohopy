@@ -18,11 +18,11 @@ class CustomFields(SyncResource):
     def create(self, data: dict[str, Any], **params: Any) -> dict[str, Any]:
         return self._client.post(self._path(), json=data, params=params or None)
 
-    def update(self, field_id: str, data: dict[str, Any], **params: Any) -> dict[str, Any]:
-        return self._client.put(self._path(field_id), json=data, params=params or None)
+    def update(self, resource_id: str, data: dict[str, Any], **params: Any) -> dict[str, Any]:
+        return self._client.put(self._path(resource_id), json=data, params=params or None)
 
-    def delete(self, field_id: str, **params: Any) -> dict[str, Any]:
-        return self._client.delete(self._path(field_id), params=params or None)
+    def delete(self, resource_id: str, **params: Any) -> dict[str, Any]:
+        return self._client.delete(self._path(resource_id), params=params or None)
 
     def reorder(self, data: dict[str, Any], **params: Any) -> dict[str, Any]:
         return self._sub_post("reorder", data, **params)
@@ -79,11 +79,11 @@ class AsyncCustomFields(AsyncResource):
     async def create(self, data: dict[str, Any], **params: Any) -> dict[str, Any]:
         return await self._client.post(self._path(), json=data, params=params or None)
 
-    async def update(self, field_id: str, data: dict[str, Any], **params: Any) -> dict[str, Any]:
-        return await self._client.put(self._path(field_id), json=data, params=params or None)
+    async def update(self, resource_id: str, data: dict[str, Any], **params: Any) -> dict[str, Any]:
+        return await self._client.put(self._path(resource_id), json=data, params=params or None)
 
-    async def delete(self, field_id: str, **params: Any) -> dict[str, Any]:
-        return await self._client.delete(self._path(field_id), params=params or None)
+    async def delete(self, resource_id: str, **params: Any) -> dict[str, Any]:
+        return await self._client.delete(self._path(resource_id), params=params or None)
 
     async def reorder(self, data: dict[str, Any], **params: Any) -> dict[str, Any]:
         return await self._client.post(self._path("reorder"), json=data, params=params or None)

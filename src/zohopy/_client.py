@@ -45,7 +45,7 @@ def _raise_for_status(resp: httpx.Response) -> dict[str, Any]:
 
     # Fast path: success
     if status < 400:
-        return resp.json()
+        return resp.json()  # type: ignore[no-any-return]
 
     # Parse body for Zoho error code and message
     try:

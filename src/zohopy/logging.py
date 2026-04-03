@@ -93,4 +93,4 @@ def get_logger(name: str = "zohopy") -> structlog.stdlib.BoundLogger:
     Returns:
         A structlog bound logger.
     """
-    return structlog.get_logger(name)
+    return structlog.get_logger(name)  # type: ignore[no-any-return]

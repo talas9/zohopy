@@ -367,7 +367,7 @@ def discover_organizations(
         )
 
     body = resp.json()
-    return body.get("organizations", [])
+    return body.get("organizations", [])  # type: ignore[no-any-return]
 
 
 # ---------------------------------------------------------------------------
