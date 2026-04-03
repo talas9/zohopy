@@ -23,9 +23,16 @@ from zohopy.products.books import ZohoBooks
 
 
 def _get_client() -> tuple[SyncZohoClient, ZohoBooks]:
-    """Create client from .env / env vars."""
+    """Create client from .env / env vars.
+
+    Reads --org from Click context if available.
+    """
     try:
         config = ZohoConfig()
+        # Check if --org was passed via CLI
+        ctx = click.get_current_context(silent=True)
+        if ctx and ctx.obj and ctx.obj.get("org_id"):
+            object.__setattr__(config, "organization_id", ctx.obj["org_id"])
         client = SyncZohoClient(config)
         return client, ZohoBooks(client)
     except Exception as e:
@@ -76,8 +83,17 @@ def _print_record(record: dict[str, Any]) -> None:
 
 @click.group()
 @click.version_option(prog_name="zohopy")
-def cli() -> None:
+@click.option(
+    "--org",
+    "org_id",
+    envvar="ZOHO_ORGANIZATION_ID",
+    help="Organization ID (overrides .env)",
+)
+@click.pass_context
+def cli(ctx: click.Context, org_id: str | None) -> None:
     """zohopy — Zoho Books CLI for agents and humans."""
+    ctx.ensure_object(dict)
+    ctx.obj["org_id"] = org_id
 
 
 # ── Setup ────────────────────────────────────────────
