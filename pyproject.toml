@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zohopy"
+dynamic = ["version"]
+description = "Modern, async-ready Python client for Zoho APIs (Books, Inventory, and more)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "talas9" },
+]
+keywords = ["zoho", "zoho-books", "zoho-inventory", "api", "sdk", "accounting", "async"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Typing :: Typed",
+    "Framework :: AsyncIO",
+]
+
+dependencies = [
+    "httpx>=0.28,<1",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.13,<3",
+    "structlog>=25.0",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "ruff>=0.15",
+    "mypy>=1.13",
+    "respx>=0.22",
+    "pre-commit>=4.0",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+]
+
+[project.scripts]
+zohopy = "zohopy.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/talas9/zohopy"
+Documentation = "https://talas9.github.io/zohopy"
+Repository = "https://github.com/talas9/zohopy"
+Issues = "https://github.com/talas9/zohopy/issues"
+Changelog = "https://github.com/talas9/zohopy/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zohopy"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "I", "N", "W", "UP", "B", "SIM", "T20",
+    "ANN", "S", "C4", "DTZ", "RUF",
+]
+ignore = [
+    "ANN401",  # dynamically-typed-expressions (Any)
+    "S101",    # assert used in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN", "S"]
+"src/zohopy/setup.py" = ["T201"]  # CLI wizard uses print()
+"src/zohopy/__main__.py" = ["T201"]
+"src/zohopy/cli.py" = ["T201", "ANN"]  # CLI uses click.echo, many small fns
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "integration: marks tests that hit real Zoho APIs (deselect with '-m \"not integration\"')",
+]
+
+[tool.coverage.run]
+source = ["zohopy"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

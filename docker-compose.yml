@@ -1,0 +1,47 @@
+# Docker Compose for ZohoPy
+#
+# Usage:
+#   docker compose run --rm zohopy-setup     # Interactive OAuth setup
+#   docker compose run --rm zohopy           # Run a one-off script
+#
+# Secrets: Mount .env or pass env vars. Never bake credentials into images.
+
+services:
+  zohopy:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - ZOHOPY_LOG_LEVEL=${ZOHOPY_LOG_LEVEL:-INFO}
+      - ZOHOPY_LOG_FORMAT=${ZOHOPY_LOG_FORMAT:-json}
+    volumes:
+      - ./scripts:/app/scripts:ro
+    entrypoint: ["python"]
+    command: ["-c", "from zohopy import ZohoConfig; print(ZohoConfig())"]
+
+  zohopy-setup:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - ZOHOPY_LOG_LEVEL=INFO
+      - ZOHOPY_LOG_FORMAT=console
+    volumes:
+      - ./.env:/app/.env
+    stdin_open: true
+    tty: true
+    # Interactive setup wizard
+    entrypoint: ["python", "-m", "zohopy"]
+
+  # Example: run a custom script
+  zohopy-script:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - ZOHOPY_LOG_LEVEL=${ZOHOPY_LOG_LEVEL:-INFO}
+      - ZOHOPY_LOG_FORMAT=${ZOHOPY_LOG_FORMAT:-json}
+    volumes:
+      - ./scripts:/app/scripts:ro
+    entrypoint: ["python"]
+    command: ["scripts/example.py"]

@@ -1,0 +1,54 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your feature suggestion!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem does this solve? Why is it needed?
+      placeholder: I want to be able to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How should this work? Include API examples if possible.
+      placeholder: |
+        ```python
+        # Ideal usage
+        books.invoices.bulk_create([...])
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Zoho Product
+      options:
+        - Books
+        - Inventory
+        - New Product (specify below)
+        - Core Library
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any workarounds or alternative approaches you've considered.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Links to Zoho API docs, screenshots, etc.
