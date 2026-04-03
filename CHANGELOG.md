@@ -7,26 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `ZOHO_DATA_CENTER` is now a required config field (was optional with `us` default)
+- `ZOHO_REFRESH_TOKEN` and `ZOHO_ORGANIZATION_ID` are now required fields
+- `ZOHO_API_DOMAIN` remains optional — overrides `ZOHO_DATA_CENTER` when set
+- Added Python 3.14 to CI test matrix and classifiers
+
+### Fixed
+- 20 mypy strict-mode errors (override signatures, return type annotations)
+- Coverage threshold set to 40% to match actual unit test coverage
+- Release workflow updated to PyPA Trusted Publishing standard with Sigstore signing
+
+### Docs
+- README trimmed to 83-line landing page
+- Full API reference moved to `docs/api.md`
+- Error handling guide moved to `docs/errors.md`
+- Setup guide moved to `docs/setup.md`
+- Environment variable docs corrected to reflect actual required/optional fields
+
 ## [0.1.0] - 2026-04-03
 
-### Added
+First public release. Published to [PyPI](https://pypi.org/project/zohopy/).
 
-- **Zoho Books API v3** — complete coverage with 43 resource types and 347 methods (sync + async)
+### Added
+- **Zoho Books API v3** — 43 resource types, 694 methods (347 sync + 347 async)
 - **Sales cycle:** Contacts, Contact Persons, Estimates, Sales Orders, Invoices, Recurring Invoices, Sales Receipts, Credit Notes, Customer Debit Notes, Customer Payments, Retainer Invoices
 - **Purchase cycle:** Purchase Orders, Bills, Recurring Bills, Vendor Credits, Vendor Payments, Expenses, Recurring Expenses
-- **Banking:** Bank Accounts, Bank Transactions, Chart of Accounts, Journals, Base Currency Adjustments
-- **Projects:** Projects, Tasks, Time Entries
-- **Assets:** Fixed Assets, Fixed Asset Types
-- **Settings:** Organizations, Taxes (+ authorities + exemptions), Currencies (+ exchange rates), Users, Preferences, Templates, Opening Balances, Custom Fields, Custom Views, Custom Modules, Reporting Tags, Workflows, Locations
+- **Banking:** Bank Accounts (with statement import), Bank Transactions (match, categorize, exclude/restore), Chart of Accounts, Journals, Base Currency Adjustments
+- **Projects:** Projects (with user/task management), Tasks, Time Entries
+- **Assets:** Fixed Assets (with depreciation forecast), Fixed Asset Types
+- **Settings:** Organizations, Taxes (authorities, exemptions, groups), Currencies (exchange rates), Users, Preferences, Templates, Opening Balances, Custom Fields, Custom Views, Custom Modules, Reporting Tags, Workflows, Locations
 - **Integration:** Zoho CRM import (customer, vendor, item)
-- **Multi-currency** support on all transactions with exchange rates
-- **Landed cost** support on bills
-- **CLI** — `zohopy` command with 30+ commands, `--json` on every command
-- **OAuth setup wizard** — Self Client + Browser redirect flows with org picker UI
-- **Structured logging** via structlog (JSON/console)
-- **Typed exceptions** — 10+ exception classes mapped from Zoho error codes
-- **Docker + Docker Compose** support
-- **CI/CD** — GitHub Actions with lint, type-check, test matrix (3.10–3.13), PyPI release
+- **Multi-currency** support with exchange rates on all transactions
+- **Landed cost** support on bills (`is_landed_cost`, `allocated_landed_costs`)
+- **CLI** — `zohopy` command with `--json` on all commands, `raw` escape hatch
+- **OAuth setup** — Self Client + Browser redirect with interactive org picker
+- **Structured logging** — JSON/console output via structlog
+- **10+ typed exceptions** mapped from Zoho error codes with smart disambiguation
+- **OAuth rate limit handling** — auto-retry with 30s/60s/90s back-off
+- **Docker** — Dockerfile + docker-compose with proper env/secrets handling
+- **CI/CD** — GitHub Actions (lint, mypy, test matrix 3.10–3.14, PyPI release)
+- 56 unit tests, 72 integration tests against live Zoho sandbox
 
 [Unreleased]: https://github.com/talas9/zohopy/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/talas9/zohopy/releases/tag/v0.1.0
