@@ -1,4 +1,8 @@
-"""Items. Ref: https://www.zoho.com/books/api/v3/items/"""
+"""Items. Ref: https://www.zoho.com/books/api/v3/items/
+
+Custom fields and warehouses are part of the item JSON body —
+pass them in create()/update() payloads, not as sub-endpoints.
+"""
 
 from __future__ import annotations
 
@@ -18,6 +22,15 @@ class Items(SyncResource):
     def mark_inactive(self, id: str) -> dict[str, Any]:
         return self._action_post(id, "inactive")
 
+    def delete_image(self, id: str) -> dict[str, Any]:
+        return self._client.delete(self._path(id, "image"))
+
+    def upload_image(self, id: str, files: dict[str, Any]) -> dict[str, Any]:
+        return self._client.post(self._path(id, "image"), files=files)
+
+    def update_custom_fields(self, id: str, data: dict[str, Any]) -> dict[str, Any]:
+        return self._action_post(id, "customfields", data)
+
 
 class AsyncItems(AsyncResource):
     _api_prefix, _resource = _P, "items"
@@ -27,3 +40,12 @@ class AsyncItems(AsyncResource):
 
     async def mark_inactive(self, id: str) -> dict[str, Any]:
         return await self._action_post(id, "inactive")
+
+    async def delete_image(self, id: str) -> dict[str, Any]:
+        return await self._client.delete(self._path(id, "image"))
+
+    async def upload_image(self, id: str, files: dict[str, Any]) -> dict[str, Any]:
+        return await self._client.post(self._path(id, "image"), files=files)
+
+    async def update_custom_fields(self, id: str, data: dict[str, Any]) -> dict[str, Any]:
+        return await self._action_post(id, "customfields", data)
