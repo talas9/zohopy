@@ -9,7 +9,7 @@ Modern, async-ready Python client for Zoho APIs — **complete Zoho Books v3 cov
 
 ## Highlights
 
-- **716 API methods** (358 sync + 358 async) across 57 resource types) across 43 resource types
+- **716 API methods** (358 sync + 358 async) across 57 resource types
 - **CLI** — `zohopy` command with `--json` on every command
 - **Multi-currency** + exchange rates on all transactions
 - **Landed cost** support on bills
@@ -33,11 +33,11 @@ zohopy setup
 # CLI
 zohopy contacts list --json
 zohopy invoices create '{"customer_id":"...","line_items":[{"item_id":"...","quantity":1}]}' --json
+zohopy --org OTHER_ORG_ID contacts list --json
 zohopy raw get /books/v3/items --json
 ```
 
 ```python
-# Python SDK
 from zohopy import ZohoConfig, SyncZohoClient
 from zohopy.products.books import ZohoBooks
 
@@ -63,7 +63,7 @@ with SyncZohoClient(ZohoConfig()) as client:
 | Document | Description |
 |----------|-------------|
 | **[AGENT.md](AGENT.md)** | Agent/LLM reference — CLI commands, SDK quick ref, error codes |
-| **[docs/api.md](docs/api.md)** | Full API reference — all 43 resources and their methods |
+| **[docs/api.md](docs/api.md)** | Full API reference — all 57 resources and their methods |
 | **[docs/errors.md](docs/errors.md)** | Error handling guide — exception hierarchy + Zoho error codes |
 | **[docs/setup.md](docs/setup.md)** | Setup guide — OAuth flows, .env, Docker, programmatic config |
 | **[CHANGELOG.md](CHANGELOG.md)** | Release history |
