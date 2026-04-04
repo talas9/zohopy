@@ -1,12 +1,10 @@
 # API Reference
 
-Complete reference for all Zoho Books v3 resources available through ZohoPy.
-
-## Resource Index
+Complete reference for all 57 Zoho Books v3 resources in ZohoPy.
 
 Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, data)`, `delete(id)` plus resource-specific actions listed below.
 
-### Sales Cycle
+## Sales Cycle
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
@@ -21,8 +19,10 @@ Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, 
 | Customer Debit Notes | `books.customer_debit_notes` | *(CRUD only)* |
 | Customer Payments | `books.customer_payments` | `refund`, `list_refunds`, `get_refund`, `update_refund`, `delete_refund`, `bulk_delete`, `update_custom_fields` |
 | Retainer Invoices | `books.retainer_invoices` | `mark_sent`, `void`, `mark_draft`, `submit_for_approval`, `approve`, `email`, `get_email_content`, `update_billing_address`, `list_templates`, `update_template`, `add_attachment`, `get_attachment`, `delete_attachment`, `list_comments`, `add_comment`, `update_comment`, `delete_comment` |
+| Sales Returns | `books.sales_returns` | `create_receive`, `delete_receive` |
+| Delivery Challans | `books.delivery_challans` | `mark_delivered` |
 
-### Purchase Cycle
+## Purchase Cycle
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
@@ -33,14 +33,22 @@ Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, 
 | Vendor Payments | `books.vendor_payments` | `refund`, `list_refunds`, `get_refund`, `update_refund`, `delete_refund`, `email`, `get_email_content`, `bulk_delete` |
 | Expenses | `books.expenses` | `list_comments`, `add_receipt`, `get_receipt`, `delete_receipt`, `add_attachment`, `create_employee`, `list_employees`, `get_employee`, `delete_employee` |
 | Recurring Expenses | `books.recurring_expenses` | `stop`, `resume`, `list_child_expenses`, `list_history` |
+| Purchase Receives | `books.purchase_receives` | *(CRUD only)* |
 
-### Items
+## Items & Inventory
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
 | Items | `books.items` | `mark_active`, `mark_inactive` |
+| Composite Items | `books.composite_items` | `mark_active`, `mark_inactive` |
+| Item Groups | `books.item_groups` | `mark_active`, `mark_inactive` |
+| Inventory Adjustments | `books.inventory_adjustments` | *(CRUD only)* |
+| Packages | `books.packages` | *(CRUD only)* |
+| Shipment Orders | `books.shipment_orders` | `mark_delivered` |
+| Transfer Orders | `books.transfer_orders` | `mark_received` |
+| Price Lists | `books.price_lists` | `mark_active`, `mark_inactive` |
 
-### Banking & Accounting
+## Banking & Accounting
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
@@ -50,7 +58,7 @@ Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, 
 | Journals | `books.journals` | `publish`, `add_comment`, `add_attachment`, `delete_comment` |
 | Base Currency Adj. | `books.base_currency_adjustments` | `list_account_details` |
 
-### Projects & Time
+## Projects & Time
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
@@ -58,14 +66,21 @@ Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, 
 | Tasks | `books.tasks` | `mark_open`, `mark_ongoing`, `mark_completed`, `update_completed_percentage`, `add_comment`, `list_comments`, `delete_comment`, `add_attachment`, `get_attachment`, `delete_attachment` |
 | Time Entries | `books.time_entries` | `start_timer`, `stop_timer`, `get_timer` |
 
-### Fixed Assets
+## Fixed Assets
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
 | Fixed Assets | `books.fixed_assets` | `mark_active`, `cancel`, `mark_draft`, `write_off`, `sell`, `list_history`, `get_forecast_depreciation`, `list_comments`, `add_comment`, `delete_comment` |
 | Fixed Asset Types | `books.fixed_asset_types` | *(CRUD only)* |
 
-### Settings & Configuration
+## Documents & Employees
+
+| Resource | Attribute | Extra Methods |
+|----------|-----------|---------------|
+| Documents | `books.documents` | *(CRUD only)* |
+| Employees | `books.employees` | *(CRUD only)* |
+
+## Settings & Configuration
 
 | Resource | Attribute | Extra Methods |
 |----------|-----------|---------------|
@@ -79,19 +94,16 @@ Every resource supports base CRUD: `create()`, `list()`, `get(id)`, `update(id, 
 | Custom Fields | `books.custom_fields` | `list_for_entity`, `reorder`, `update_status`, `update_dropdown_options`, `bulk_fetch`, `get_usage`, `check_formula`, `list_lookup_fields`, `list_simple`, `get_fields_meta`, `get_entity_fields_meta` |
 | Custom Views | `books.custom_views` | `reorder`, `list_created`, `get_search_fields` |
 | Custom Modules | `books.custom_modules` | `create_record`, `list_records`, `get_record`, `update_record`, `delete_record`, `bulk_update_records`, `delete_records` |
+| Custom Buttons | `books.custom_buttons` | *(CRUD only)* |
+| Email Templates | `books.email_templates` | *(CRUD only)* |
 | Reporting Tags | `books.reporting_tags` | `mark_active`, `mark_inactive`, `mark_default_option`, `update_options`, `update_visibility`, `mark_option_active`, `mark_option_inactive`, `get_options_detail`, `get_all_options`, `reorder` |
 | Workflows | `books.workflows` | *(list only)* |
 | Locations | `books.locations` | `enable`, `mark_active`, `mark_inactive`, `mark_primary` |
-
-### Integration
-
-| Resource | Attribute | Methods |
-|----------|-----------|---------|
 | CRM Integration | `books.crm_integration` | `import_customer_by_account`, `import_customer_by_contact`, `import_vendor`, `import_item` |
 
 ## Async Usage
 
-Every sync class has an async counterpart. Use `AsyncZohoBooks` with `AsyncZohoClient`:
+Every sync class has an async counterpart:
 
 ```python
 from zohopy import AsyncZohoClient, ZohoConfig
