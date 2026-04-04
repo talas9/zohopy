@@ -86,7 +86,7 @@ from zohopy.products.books import ZohoBooks
 with SyncZohoClient(ZohoConfig()) as client:
     books = ZohoBooks(client)
 
-    # 43 resource attributes available:
+    # 57 resource attributes available:
     # books.contacts, books.invoices, books.items, books.bills,
     # books.estimates, books.sales_orders, books.purchase_orders,
     # books.expenses, books.credit_notes, books.vendor_credits,

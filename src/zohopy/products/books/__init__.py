@@ -23,6 +23,10 @@ from zohopy.products.books.base_currency import (
     BaseCurrencyAdjustments,
 )
 from zohopy.products.books.bills import AsyncBills, Bills
+from zohopy.products.books.composite_items import (
+    AsyncCompositeItems,
+    CompositeItems,
+)
 from zohopy.products.books.contact_persons import (
     AsyncContactPersons,
     ContactPersons,
@@ -33,7 +37,10 @@ from zohopy.products.books.crm_integration import (
     AsyncCRMIntegration,
     CRMIntegration,
 )
-from zohopy.products.books.custom_fields import AsyncCustomFields, CustomFields
+from zohopy.products.books.custom_fields import (
+    AsyncCustomFields,
+    CustomFields,
+)
 from zohopy.products.books.custom_modules import (
     AsyncCustomModules,
     CustomModules,
@@ -42,6 +49,12 @@ from zohopy.products.books.customer_debit_notes import (
     AsyncCustomerDebitNotes,
     CustomerDebitNotes,
 )
+from zohopy.products.books.delivery_challans import (
+    AsyncDeliveryChallans,
+    DeliveryChallans,
+)
+from zohopy.products.books.documents import AsyncDocuments, Documents
+from zohopy.products.books.employees import AsyncEmployees, Employees
 from zohopy.products.books.estimates import AsyncEstimates, Estimates
 from zohopy.products.books.expenses import AsyncExpenses, Expenses
 from zohopy.products.books.fixed_asset_types import (
@@ -49,18 +62,22 @@ from zohopy.products.books.fixed_asset_types import (
     FixedAssetTypes,
 )
 from zohopy.products.books.fixed_assets import AsyncFixedAssets, FixedAssets
-from zohopy.products.books.invoices import AsyncInvoices, Invoices
-from zohopy.products.books.items import AsyncItems, Items
-from zohopy.products.books.locations import (
-    AsyncLocations,
-    Locations,
+from zohopy.products.books.inventory_adjustments import (
+    AsyncInventoryAdjustments,
+    InventoryAdjustments,
 )
+from zohopy.products.books.invoices import AsyncInvoices, Invoices
+from zohopy.products.books.item_groups import AsyncItemGroups, ItemGroups
+from zohopy.products.books.items import AsyncItems, Items
+from zohopy.products.books.locations import AsyncLocations, Locations
+from zohopy.products.books.packages import AsyncPackages, Packages
 from zohopy.products.books.payments import (
     AsyncCustomerPayments,
     AsyncVendorPayments,
     CustomerPayments,
     VendorPayments,
 )
+from zohopy.products.books.price_lists import AsyncPriceLists, PriceLists
 from zohopy.products.books.projects import (
     AsyncProjects,
     AsyncTasks,
@@ -72,6 +89,10 @@ from zohopy.products.books.projects import (
 from zohopy.products.books.purchase_orders import (
     AsyncPurchaseOrders,
     PurchaseOrders,
+)
+from zohopy.products.books.purchase_receives import (
+    AsyncPurchaseReceives,
+    PurchaseReceives,
 )
 from zohopy.products.books.recurring_bills import (
     AsyncRecurringBills,
@@ -98,9 +119,15 @@ from zohopy.products.books.sales_receipts import (
     AsyncSalesReceipts,
     SalesReceipts,
 )
+from zohopy.products.books.sales_returns import (
+    AsyncSalesReturns,
+    SalesReturns,
+)
 from zohopy.products.books.settings import (
     AsyncCurrencies,
+    AsyncCustomButtons,
     AsyncCustomViews,
+    AsyncEmailTemplates,
     AsyncOpeningBalances,
     AsyncOrganizations,
     AsyncPreferences,
@@ -109,7 +136,9 @@ from zohopy.products.books.settings import (
     AsyncUsers,
     AsyncWorkflows,
     Currencies,
+    CustomButtons,
     CustomViews,
+    EmailTemplates,
     OpeningBalances,
     Organizations,
     Preferences,
@@ -117,6 +146,14 @@ from zohopy.products.books.settings import (
     Templates,
     Users,
     Workflows,
+)
+from zohopy.products.books.shipment_orders import (
+    AsyncShipmentOrders,
+    ShipmentOrders,
+)
+from zohopy.products.books.transfer_orders import (
+    AsyncTransferOrders,
+    TransferOrders,
 )
 from zohopy.products.books.vendor_credits import (
     AsyncVendorCredits,
@@ -143,6 +180,8 @@ class ZohoBooks:
         self.customer_debit_notes = CustomerDebitNotes(client)
         self.customer_payments = CustomerPayments(client)
         self.retainer_invoices = RetainerInvoices(client)
+        self.sales_returns = SalesReturns(client)
+        self.delivery_challans = DeliveryChallans(client)
 
         # Purchase cycle
         self.purchase_orders = PurchaseOrders(client)
@@ -152,9 +191,17 @@ class ZohoBooks:
         self.vendor_payments = VendorPayments(client)
         self.expenses = Expenses(client)
         self.recurring_expenses = RecurringExpenses(client)
+        self.purchase_receives = PurchaseReceives(client)
 
-        # Items
+        # Items & Inventory
         self.items = Items(client)
+        self.composite_items = CompositeItems(client)
+        self.item_groups = ItemGroups(client)
+        self.inventory_adjustments = InventoryAdjustments(client)
+        self.packages = Packages(client)
+        self.shipment_orders = ShipmentOrders(client)
+        self.transfer_orders = TransferOrders(client)
+        self.price_lists = PriceLists(client)
 
         # Banking
         self.bank_accounts = BankAccounts(client)
@@ -174,6 +221,10 @@ class ZohoBooks:
         self.fixed_assets = FixedAssets(client)
         self.fixed_asset_types = FixedAssetTypes(client)
 
+        # Documents & Employees
+        self.documents = Documents(client)
+        self.employees = Employees(client)
+
         # Settings & Config
         self.organizations = Organizations(client)
         self.taxes = Taxes(client)
@@ -185,6 +236,8 @@ class ZohoBooks:
         self.custom_fields = CustomFields(client)
         self.custom_views = CustomViews(client)
         self.custom_modules = CustomModules(client)
+        self.custom_buttons = CustomButtons(client)
+        self.email_templates = EmailTemplates(client)
         self.reporting_tags = ReportingTags(client)
         self.workflows = Workflows(client)
         self.locations = Locations(client)
@@ -207,6 +260,8 @@ class AsyncZohoBooks:
         self.customer_debit_notes = AsyncCustomerDebitNotes(client)
         self.customer_payments = AsyncCustomerPayments(client)
         self.retainer_invoices = AsyncRetainerInvoices(client)
+        self.sales_returns = AsyncSalesReturns(client)
+        self.delivery_challans = AsyncDeliveryChallans(client)
 
         # Purchase cycle
         self.purchase_orders = AsyncPurchaseOrders(client)
@@ -216,9 +271,17 @@ class AsyncZohoBooks:
         self.vendor_payments = AsyncVendorPayments(client)
         self.expenses = AsyncExpenses(client)
         self.recurring_expenses = AsyncRecurringExpenses(client)
+        self.purchase_receives = AsyncPurchaseReceives(client)
 
-        # Items
+        # Items & Inventory
         self.items = AsyncItems(client)
+        self.composite_items = AsyncCompositeItems(client)
+        self.item_groups = AsyncItemGroups(client)
+        self.inventory_adjustments = AsyncInventoryAdjustments(client)
+        self.packages = AsyncPackages(client)
+        self.shipment_orders = AsyncShipmentOrders(client)
+        self.transfer_orders = AsyncTransferOrders(client)
+        self.price_lists = AsyncPriceLists(client)
 
         # Banking
         self.bank_accounts = AsyncBankAccounts(client)
@@ -238,6 +301,10 @@ class AsyncZohoBooks:
         self.fixed_assets = AsyncFixedAssets(client)
         self.fixed_asset_types = AsyncFixedAssetTypes(client)
 
+        # Documents & Employees
+        self.documents = AsyncDocuments(client)
+        self.employees = AsyncEmployees(client)
+
         # Settings & Config
         self.organizations = AsyncOrganizations(client)
         self.taxes = AsyncTaxes(client)
@@ -249,6 +316,8 @@ class AsyncZohoBooks:
         self.custom_fields = AsyncCustomFields(client)
         self.custom_views = AsyncCustomViews(client)
         self.custom_modules = AsyncCustomModules(client)
+        self.custom_buttons = AsyncCustomButtons(client)
+        self.email_templates = AsyncEmailTemplates(client)
         self.reporting_tags = AsyncReportingTags(client)
         self.workflows = AsyncWorkflows(client)
         self.locations = AsyncLocations(client)
