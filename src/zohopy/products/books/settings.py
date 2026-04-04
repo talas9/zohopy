@@ -334,3 +334,19 @@ class AsyncCustomViews(AsyncResource):
             self._path("searchfields"),
             params=params or None,
         )
+
+
+class CustomButtons(SyncResource):
+    _api_prefix, _resource = _P, "settings/custombuttons"
+
+
+class AsyncCustomButtons(AsyncResource):
+    _api_prefix, _resource = _P, "settings/custombuttons"
+
+
+class EmailTemplates(SyncResource):
+    _api_prefix, _resource = _P, "settings/emailtemplates"
+
+
+class AsyncEmailTemplates(AsyncResource):
+    _api_prefix, _resource = _P, "settings/emailtemplates"

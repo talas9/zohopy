@@ -9,7 +9,7 @@ Modern, async-ready Python client for Zoho APIs — **complete Zoho Books v3 cov
 
 ## Highlights
 
-- **694 API methods** (347 sync + 347 async) across 43 resource types
+- **716 API methods** (358 sync + 358 async) across 57 resource types) across 43 resource types
 - **CLI** — `zohopy` command with `--json` on every command
 - **Multi-currency** + exchange rates on all transactions
 - **Landed cost** support on bills
@@ -52,7 +52,7 @@ with SyncZohoClient(ZohoConfig()) as client:
 
 | Product | Status | Coverage |
 |---------|--------|----------|
-| **Zoho Books** | ✅ v3 | 43 resources, 347 methods |
+| **Zoho Books** | ✅ v3 | 57 resources, 358 methods |
 | Zoho Inventory | 🔜 Coming soon | — |
 | Zoho CRM | 🔜 Coming soon | — |
 | Zoho Payroll | 🔜 Planned | — |
