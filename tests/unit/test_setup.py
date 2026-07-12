@@ -6,8 +6,13 @@ import httpx
 import pytest
 import respx
 
+from zohopy.config import DataCenter
 from zohopy.exceptions import ZohoTokenRefreshError
-from zohopy.setup import discover_organizations, exchange_grant_token
+from zohopy.setup import (
+    discover_organizations,
+    exchange_grant_token,
+    resolve_accounts_url,
+)
 
 
 @respx.mock
@@ -32,6 +37,36 @@ def test_exchange_grant_token_success():
     )
     assert result["refresh_token"] == "rt_permanent"
     assert result["api_domain"] == "https://www.zohoapis.com"
+
+
+@respx.mock
+def test_exchange_grant_token_india():
+    """India grant codes must be exchanged against accounts.zoho.in."""
+    route = respx.post("https://accounts.zoho.in/oauth/v2/token").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "access_token": "at",
+                "refresh_token": "rt_in",
+                "api_domain": "https://www.zohoapis.in",
+                "token_type": "Bearer",
+                "expires_in": 3600,
+            },
+        )
+    )
+    # Ensure we do NOT hit the US host
+    respx.post("https://accounts.zoho.com/oauth/v2/token").mock(
+        return_value=httpx.Response(200, json={"error": "invalid_code"})
+    )
+    result = exchange_grant_token(
+        client_id="cid",
+        client_secret="csec",
+        grant_token="grant_code",
+        accounts_url="https://accounts.zoho.in",
+    )
+    assert result["refresh_token"] == "rt_in"
+    assert result["api_domain"] == "https://www.zohoapis.in"
+    assert "accounts.zoho.in" in str(route.calls[0].request.url)
 
 
 @respx.mock
@@ -120,3 +155,33 @@ def test_exchange_with_redirect_uri():
     # Verify redirect_uri was sent
     req_url = str(route.calls[0].request.url)
     assert "redirect_uri" in req_url
+
+
+def test_resolve_accounts_url_prefers_accounts_server():
+    assert (
+        resolve_accounts_url(
+            accounts_server="https://accounts.zoho.in/",
+            location="us",
+            fallback="https://accounts.zoho.com",
+        )
+        == "https://accounts.zoho.in"
+    )
+
+
+def test_resolve_accounts_url_from_location():
+    assert (
+        resolve_accounts_url(location="in", fallback="https://accounts.zoho.com")
+        == DataCenter.IN.accounts_url
+    )
+    assert (
+        resolve_accounts_url(location="eu", fallback="https://accounts.zoho.com")
+        == DataCenter.EU.accounts_url
+    )
+
+
+def test_resolve_accounts_url_fallback():
+    assert (
+        resolve_accounts_url(location="nope", fallback="https://accounts.zoho.com")
+        == "https://accounts.zoho.com"
+    )
+    assert resolve_accounts_url() == "https://accounts.zoho.com"

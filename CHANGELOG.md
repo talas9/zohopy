@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- OAuth setup wizard no longer hardcodes `accounts.zoho.com`. It prompts for
+  data center and, on browser redirect, exchanges the grant code against the
+  `accounts-server` / `location` from Zoho's callback (fixes `invalid_code`
+  for India and other non-US orgs).
+
 ## [0.2.0] - 2026-04-04
 
 ### Added

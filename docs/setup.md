@@ -14,14 +14,22 @@ Supports two flows:
 1. **Self Client** — paste a grant code from the API Console
 2. **Browser redirect** — opens browser, captures OAuth code on localhost
 
-Both auto-detect your data center and discover your organizations.
+The wizard asks for your **data center** first (`us`, `eu`, `in`, …). Grant
+codes are region-bound: exchanging an India code against `accounts.zoho.com`
+returns `invalid_code`.
+
+For browser login, Zoho's redirect includes `accounts-server` / `location`
+(e.g. `accounts-server=https://accounts.zoho.in&location=in`). The setup flow
+uses those values for the token exchange when present.
 
 ### Manual Setup
 
-1. Go to [api-console.zoho.com](https://api-console.zoho.com/)
+1. Go to the API Console for **your** data center
+   ([US](https://api-console.zoho.com/), [EU](https://api-console.zoho.eu/),
+   [IN](https://api-console.zoho.in/), …)
 2. Create a **Self Client** app
 3. Generate a grant code with scope `ZohoBooks.fullaccess.all`
-4. Exchange it:
+4. Exchange it against the matching accounts host:
 
 ```python
 from zohopy.setup import exchange_grant_token
@@ -30,6 +38,7 @@ result = exchange_grant_token(
     client_id="YOUR_CLIENT_ID",
     client_secret="YOUR_CLIENT_SECRET",
     grant_token="THE_GRANT_CODE",
+    accounts_url="https://accounts.zoho.in",  # must match the issuing DC
 )
 # result["refresh_token"] — permanent
 # result["api_domain"] — your data center

@@ -6,7 +6,7 @@ Machine-readable reference for AI coding agents. All CLI commands support `--jso
 
 ```bash
 # Setup & Config
-zohopy setup                                    # Interactive OAuth wizard
+zohopy setup                                    # Interactive OAuth wizard (asks for data center)
 zohopy config --json                            # Show configuration
 zohopy orgs --json                              # List all organizations
 zohopy --org ORG_ID contacts list --json        # Switch org at runtime
