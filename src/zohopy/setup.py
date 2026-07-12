@@ -42,9 +42,66 @@ __version__ = "0.1.0"
 # ---------------------------------------------------------------------------
 
 _REGION_ACCOUNTS: dict[str, str] = {dc.value: dc.accounts_url for dc in DataCenter}
+_API_CONSOLE_URLS: dict[DataCenter, str] = {
+    DataCenter.US: "https://api-console.zoho.com",
+    DataCenter.EU: "https://api-console.zoho.eu",
+    DataCenter.IN: "https://api-console.zoho.in",
+    DataCenter.AU: "https://api-console.zoho.com.au",
+    DataCenter.JP: "https://api-console.zoho.jp",
+    DataCenter.CA: "https://api-console.zohocloud.ca",
+    DataCenter.CN: "https://api-console.zoho.com.cn",
+    DataCenter.SA: "https://api-console.zoho.sa",
+}
 _DEFAULT_SCOPES = "ZohoBooks.fullaccess.all,ZohoInventory.fullaccess.all"
 _LOCALHOST_PORT = 11470
 _LOCALHOST_REDIRECT = f"http://localhost:{_LOCALHOST_PORT}/callback"
+_DEFAULT_ACCOUNTS_URL = DataCenter.US.accounts_url
+
+
+def resolve_accounts_url(
+    *,
+    accounts_server: str | None = None,
+    location: str | None = None,
+    fallback: str = _DEFAULT_ACCOUNTS_URL,
+) -> str:
+    """Pick the Zoho accounts host for token exchange.
+
+    Prefer the ``accounts-server`` / ``location`` values Zoho returns on the
+    OAuth redirect. Falling back to a hardcoded US host breaks non-US orgs
+    (grant codes are region-bound and exchange as ``invalid_code``).
+    """
+    if accounts_server:
+        return accounts_server.rstrip("/")
+    if location:
+        try:
+            return DataCenter(location.strip().lower()).accounts_url
+        except ValueError:
+            pass
+    return fallback.rstrip("/")
+
+
+def _prompt_data_center(default: DataCenter = DataCenter.US) -> DataCenter:
+    """Ask which Zoho data center to authorize against."""
+    regions = list(DataCenter)
+    print("Data center (grant codes are region-specific):")
+    for i, dc in enumerate(regions, 1):
+        marker = " (default)" if dc is default else ""
+        print(f"  {i}. {dc.value} — {dc.accounts_url}{marker}")
+    print()
+
+    raw = input(f"Data center [{default.value}]: ").strip().lower()
+    if not raw:
+        return default
+    if raw.isdigit():
+        idx = int(raw) - 1
+        if 0 <= idx < len(regions):
+            return regions[idx]
+    try:
+        return DataCenter(raw)
+    except ValueError:
+        print(f"Unknown data center {raw!r}; using {default.value}.")
+        return default
+
 
 # ---------------------------------------------------------------------------
 # HTML templates
@@ -297,7 +354,7 @@ def exchange_grant_token(
     client_secret: str,
     grant_token: str,
     redirect_uri: str | None = None,
-    accounts_url: str = "https://accounts.zoho.com",
+    accounts_url: str = _DEFAULT_ACCOUNTS_URL,
     timeout: float = 30.0,
 ) -> dict[str, Any]:
     """Exchange a grant token (authorization code) for access + refresh tokens.
@@ -307,7 +364,9 @@ def exchange_grant_token(
         client_secret: OAuth client secret.
         grant_token: The authorization code.
         redirect_uri: Required for Server-based apps.
-        accounts_url: Zoho accounts server for your region.
+        accounts_url: Zoho accounts server for your region
+            (e.g. ``https://accounts.zoho.in``). Must match the DC that
+            issued the grant code.
         timeout: HTTP timeout in seconds.
 
     Returns:
@@ -389,6 +448,12 @@ class _CallbackHandler(http.server.BaseHTTPRequestHandler):
 
         if parsed.path == "/callback" and "code" in qs:
             _state["grant_code"] = qs["code"][0]
+            # Zoho includes the issuing accounts host + location on redirect
+            # (e.g. accounts-server=https://accounts.zoho.in&location=in).
+            if "accounts-server" in qs:
+                _state["accounts_server"] = qs["accounts-server"][0]
+            if "location" in qs:
+                _state["location"] = qs["location"][0]
             self._send_html(_loading_page())
             _code_event.set()
 
@@ -463,7 +528,7 @@ def authorize_with_browser(
     *,
     client_id: str,
     client_secret: str,
-    accounts_url: str = "https://accounts.zoho.com",
+    accounts_url: str = _DEFAULT_ACCOUNTS_URL,
     scopes: str = _DEFAULT_SCOPES,
     port: int = _LOCALHOST_PORT,
     timeout_seconds: int = 300,
@@ -476,11 +541,16 @@ def authorize_with_browser(
     4. Shows org picker in browser
     5. Returns tokens + selected org_id
 
+    Token exchange uses the ``accounts-server`` / ``location`` from the
+    OAuth redirect when present, so non-US data centers (e.g. India) work
+    even if the auth URL host differed.
+
     Returns:
         Dict with ``access_token``, ``refresh_token``, ``api_domain``,
         ``organization_id``, ``organization_name``, ``data_center``.
     """
     redirect_uri = f"http://localhost:{port}/callback"
+    accounts_url = accounts_url.rstrip("/")
 
     # Reset shared state
     _state.clear()
@@ -520,6 +590,15 @@ def authorize_with_browser(
             raise ZohoTokenRefreshError(f"Authorization denied: {_state['error']}")
 
         grant_code = _state["grant_code"]
+        exchange_accounts_url = resolve_accounts_url(
+            accounts_server=_state.get("accounts_server"),
+            location=_state.get("location"),
+            fallback=accounts_url,
+        )
+        if exchange_accounts_url != accounts_url:
+            print(
+                f"  Using accounts server from redirect: {exchange_accounts_url}"
+            )
 
         # Exchange tokens
         _state["status_msg"] = "Exchanging tokens..."
@@ -529,7 +608,7 @@ def authorize_with_browser(
             client_secret=client_secret,
             grant_token=grant_code,
             redirect_uri=redirect_uri,
-            accounts_url=accounts_url,
+            accounts_url=exchange_accounts_url,
         )
 
         api_domain = tokens["api_domain"]
@@ -647,6 +726,10 @@ def interactive_setup() -> None:
         print("Invalid choice. Defaulting to Self Client (1).")
         flow = "1"
 
+    print()
+    data_center = _prompt_data_center()
+    accounts_url = data_center.accounts_url
+
     client_id = input("\nClient ID: ").strip()
     client_secret = input("Client Secret: ").strip()
 
@@ -654,10 +737,13 @@ def interactive_setup() -> None:
         print("Error: Client ID and Secret are required.")
         sys.exit(1)
 
-    accounts_url = "https://accounts.zoho.com"
-
     if flow == "1":
-        result = _flow_self_client(client_id, client_secret, accounts_url)
+        result = _flow_self_client(
+            client_id,
+            client_secret,
+            accounts_url,
+            data_center=data_center,
+        )
         api_domain = result["api_domain"]
         dc = DataCenter.from_api_domain(api_domain)
         # Discover org in terminal
@@ -697,14 +783,19 @@ def _flow_self_client(
     client_id: str,
     client_secret: str,
     accounts_url: str,
+    *,
+    data_center: DataCenter = DataCenter.US,
 ) -> dict[str, Any]:
+    console_url = _API_CONSOLE_URLS.get(data_center, _API_CONSOLE_URLS[DataCenter.US])
     print()
     print("Generate a grant code in the API Console:")
-    print("  1. Go to https://api-console.zoho.com/ -> your Self Client")
+    print(f"  1. Go to {console_url}/ -> your Self Client")
     print("  2. Click 'Generate Code' tab")
     print("  3. Scope: ZohoBooks.fullaccess.all,ZohoInventory.fullaccess.all")
     print("  4. Time Duration: 10 minutes")
     print("  5. Click Create, copy the code")
+    print()
+    print(f"  Token exchange host: {accounts_url}")
     print()
 
     grant_token = input("Grant token (code): ").strip()
@@ -722,6 +813,10 @@ def _flow_self_client(
         )
     except ZohoTokenRefreshError as e:
         print(f"Error: {e}")
+        print(
+            "Hint: grant codes are bound to the data center that issued them. "
+            f"Re-run setup and pick the matching region (current: {data_center.value})."
+        )
         sys.exit(1)
 
 
@@ -733,6 +828,8 @@ def _flow_browser(
     print()
     print("Your Server-based app needs this redirect URL:")
     print(f"  {_LOCALHOST_REDIRECT}")
+    print()
+    print(f"Authorization host: {accounts_url}")
     print()
 
     ready = input("Is it configured? [Y/n]: ").strip().lower()
